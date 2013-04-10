@@ -19,9 +19,8 @@ public class QueryOptimizer {
 		}
 
 		File configFile = new File(args[2]);
-		
-		try {
 		Properties configProps = new Properties();
+		try {
 		configProps.load(new FileInputStream(configFile));
 		} catch (IOException exception) {
 			System.out.println(exception.getMessage());
@@ -29,7 +28,9 @@ public class QueryOptimizer {
 		}
 		
 		ArrayList<ArrayList<Integer>> queries = readQueryFile(args[1]);
-		
+		for (int i = 0; i < queries.size(); i++) {
+			optimizeQuery(queries.get(i), configProps);
+		}
 		
 	}
 	
@@ -39,8 +40,7 @@ public class QueryOptimizer {
 		ArrayList<ArrayList<Integer>> queries = new ArrayList<ArrayList<Integer>>();
 
 		try {
-			InputStream queryIn = new BufferedInputStream(
-					new FileInputStream(queryFile));
+			InputStream queryIn = new BufferedInputStream(new FileInputStream(queryFile));
 			queryReader = new BufferedReader(new InputStreamReader(queryIn));	
 
 			try {
@@ -65,7 +65,29 @@ public class QueryOptimizer {
 		return queries;
 	}
 	
-	private void optimizeQuery(ArrayList<Integer> selectivities, Properties configProp) {
+	private static void optimizeQuery(ArrayList<Integer> selectivities, Properties configProp) {
+		int k = selectivities.size();
+		RecordNode[] searchSpace = new RecordNode[2^k];
+		
+		
+	}
+	
+	private class RecordNode {
+		int numberOfBT;
+		double productOfSelectivities;
+		Boolean noBranchFlag;
+		double bestCost;
+		int left;
+		int right;
+		
+		public RecordNode(int numberOfBT, double productOfSelectivities,
+				Boolean noBranchFlag, double bestCost) {
+			super();
+			this.numberOfBT = numberOfBT;
+			this.productOfSelectivities = productOfSelectivities;
+			this.noBranchFlag = noBranchFlag;
+			this.bestCost = bestCost;
+		}
 		
 	}
 }

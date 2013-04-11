@@ -29,7 +29,7 @@ public class QueryPlanBitmaskTest {
 
     @Test
     public void test10101() {
-        List<Short> expected = Arrays.asList(new Short[]{1, 3, 5});
+        List<Integer> expected = Arrays.asList(new Integer[]{1, 3, 5});
         assertTrue(P10101.getAtoms().equals(expected));
     }
 
@@ -49,7 +49,7 @@ public class QueryPlanBitmaskTest {
     @Test
     public void test111000() {
         /* 111000 */
-        List<Short> expected = Arrays.asList(new Short[]{4, 5, 6});
+        List<Integer> expected = Arrays.asList(new Integer[]{4, 5, 6});
         QueryPlan p = new QueryPlan(0x0038, 0, 0, false, 0);
         assertTrue(p.getAtoms().equals(expected));
     }
@@ -57,7 +57,7 @@ public class QueryPlanBitmaskTest {
     @Test
     public void test1010011() {
         /* 1010011 */
-        List<Short> expected = Arrays.asList(new Short[]{1, 2, 5, 7});
+        List<Integer> expected = Arrays.asList(new Integer[]{1, 2, 5, 7});
         QueryPlan p = new QueryPlan(0x0053, 0, 0, false, 0);
         assertTrue(p.getAtoms().equals(expected));
     }

@@ -19,7 +19,7 @@ public class QueryOptimizerUtils {
 
         try {
             InputStream queryIn = new BufferedInputStream(new FileInputStream(
-                    queryFile));
+                        queryFile));
             queryReader = new BufferedReader(new InputStreamReader(queryIn));
 
             try {
@@ -32,7 +32,7 @@ public class QueryOptimizerUtils {
                         selectivities.add(Float.parseFloat(token));
                     }
                     queries.add(selectivities.toArray(new Float[selectivities
-                            .size()]));
+                                .size()]));
                 }
             } finally {
                 queryReader.close();
@@ -118,22 +118,22 @@ public class QueryOptimizerUtils {
     }
 
     private static final String STATISTICS_FMT =
-            "==================================================================\n"
-            + "%s\n"
-            + "------------------------------------------------------------------\n"
-            + "%s\n"
-            + "------------------------------------------------------------------\n"
-            + "cost: %s\n"
-            + "==================================================================\n";
+        "==================================================================\n"
+        + "%s\n"
+        + "------------------------------------------------------------------\n"
+        + "%s\n"
+        + "------------------------------------------------------------------\n"
+        + "cost: %s\n"
+        + "==================================================================\n";
     private static final String NO_BRANCH_CODE_FMT =
-            "if(%s) {\n" +
-            "    answer[j] = i;\n" +
-            "    j += (%s);\n" +
-            "}\n";
+        "if(%s) {\n" +
+        "    answer[j] = i;\n" +
+        "    j += (%s);\n" +
+        "}\n";
     private static final String CODE_FMT =
-            "if(%s) {\n" +
-            "    answer[j++] = i;\n" +
-            "}\n";
+        "if(%s) {\n" +
+        "    answer[j++] = i;\n" +
+        "}\n";
     private static final String ATOM_FMT = "t%d[o%d[i]]";
     private static final String TERM_FMT = "%s & %s";
     private static final String TERMS_FMT = "%s && %s";

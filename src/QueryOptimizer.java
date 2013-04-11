@@ -29,20 +29,22 @@ public class QueryOptimizer {
 	}
 
 	private void optimize() {
+	    /* set up the search space with power set of selectivities */
 		initializeSearchSpace();
+
+		/* optimize */
 	}
 
 	private void initializeSearchSpace() {
 		this.searchSpace = new QueryPlan[2 ^ selectivities.length];
 		for (int i = 0, bitmask = 1; i < searchSpace.length; i++, bitmask++) {
-			//searchSpace[i] = new QueryPlan(bitmask, numberOfBT, productOfSelectivities, noBranchFlag, cost)
+			searchSpace[i] = new QueryPlan(bitmask, selectivities);
 		}
 	}
 
 
-	private char[] getStatistics() {
-
-		return new char[0];//getFormattedStatistics(selectivities, code, cost);
+	private String getStatistics() {
+		return searchSpace[searchSpace.length - 1].getFormattedStatistics(selectivities);
 	}
 
 	private static List<Float[]> readQueryFile(String queryFileName) {

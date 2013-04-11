@@ -15,14 +15,16 @@ public class QueryPlanOutputTest {
     /* 10001 */
     private static QueryPlan P10001;
 
+    private static final Float[] selectivities5 = new Float[]{0.5f, 0.2f, 0.8f, 0.2f, 0.4f};
+
     @Before
     public void setUp() {
         /* 10101 */
-        P10101 = new QueryPlan(0x0015, 0, 0, false, 0);
+        P10101 = new QueryPlan(0x0015, selectivities5);
         /* 00100 */
-        P00100 = new QueryPlan(0x0004, 0, 0, false, 0);
+        P00100 = new QueryPlan(0x0004, selectivities5);
         /* 10001 */
-        P10001 = new QueryPlan(0x0011, 0, 0, false, 0);
+        P10001 = new QueryPlan(0x0011, selectivities5);
     }
 
     @Test
@@ -47,4 +49,5 @@ public class QueryPlanOutputTest {
         System.out.println(code);
 
     }
+
 }

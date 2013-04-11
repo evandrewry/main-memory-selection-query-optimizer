@@ -33,7 +33,7 @@ public class QueryPlanUtils {
         return String.format(ATOM_FMT, atom, atom);
     }
 
-    public static String formatSelectivities(float[] selectivities) {
+    public static String formatSelectivities(Float[] selectivities) {
         String s = (selectivities.length == 0) ? "" : String.valueOf(selectivities[0]);
         for (int i = 1; i < selectivities.length; i++) {
             s = String.format(SELECTIVITIES_FMT, s, selectivities[i]);
@@ -41,7 +41,7 @@ public class QueryPlanUtils {
         return s;
     }
 
-    public static String formatStatistics(float[] selectivities, String code, float cost) {
+    public static String formatStatistics(Float[] selectivities, String code, float cost) {
         return String.format(STATISTICS_FMT, formatSelectivities(selectivities), code, cost);
     }
 
@@ -63,6 +63,17 @@ public class QueryPlanUtils {
             bitmask >>>= 0x0001;
         }
         return terms;
+    }
+
+    public static float productOfSelectivities(Float[] selectivities, long bitmask) {
+        float prod = 1;
+        for (Float s : selectivities) {
+            if ((bitmask & 0x0001) == 0x0001) {
+                prod *= s;
+            }
+            bitmask >>>= 0x0001;
+        }
+        return prod;
     }
 
     private static final String STATISTICS_FMT =
@@ -87,5 +98,6 @@ public class QueryPlanUtils {
     private static final String TERMS_FMT = "%s && %s";
     private static final String SELECTIVITIES_FMT = "%s %s";
     public static final short BITS_PER_BITMASK = 64;
+
 
 }

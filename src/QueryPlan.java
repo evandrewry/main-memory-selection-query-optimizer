@@ -4,23 +4,36 @@ import java.util.List;
 
 class QueryPlan {
 	long bitmask;
-	int numberOfBT;
 	float productOfSelectivities;
 	boolean noBranchFlag;
 	float cost;
 	QueryPlan left;
 	QueryPlan right;
 
-	public QueryPlan(long bitmask, int numberOfBT, float productOfSelectivities,
-			boolean noBranchFlag, float cost) {
+	public QueryPlan(long bitmask, Float[] selectivities) {
+	    /* set bitmask and selectivity product */
 		this.bitmask = bitmask;
-		this.numberOfBT = numberOfBT;
-		this.productOfSelectivities = productOfSelectivities;
-		this.noBranchFlag = noBranchFlag;
-		this.cost = cost;
+		this.productOfSelectivities = QueryPlanUtils.productOfSelectivities(selectivities, bitmask);
+
+		/* compare to no-branch plan */
+	    float branchCost = calculateCost();
+		float noBranchCost = calculateNoBranchCost();
+        this.noBranchFlag = branchCost > noBranchCost;
+        this.cost = this.noBranchFlag ? noBranchCost : branchCost;
+
 	}
 
-	public void setChildren(QueryPlan left, QueryPlan right) {
+	private float calculateNoBranchCost() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    private float calculateCost() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void setChildren(QueryPlan left, QueryPlan right) {
 	    this.left = left;
 	    this.right = right;
 	    this.cost = left.cost + right.cost;
@@ -39,7 +52,7 @@ class QueryPlan {
 	}
 
 
-    public String getFormattedStatistics(float[] selectivities) {
+    public String getFormattedStatistics(Float[] selectivities) {
         return QueryPlanUtils.formatStatistics(selectivities, getFormattedCode(), this.cost);
     }
 

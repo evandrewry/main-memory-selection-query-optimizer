@@ -1,8 +1,49 @@
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 
-public class QueryPlanUtils {
+public class QueryOptimizerUtils {
+
+    public static List<Float[]> readQueryFile(String queryFileName) {
+        File queryFile = new File(queryFileName);
+        BufferedReader queryReader;
+        List<Float[]> queries = new ArrayList<Float[]>();
+
+        try {
+            InputStream queryIn = new BufferedInputStream(new FileInputStream(
+                    queryFile));
+            queryReader = new BufferedReader(new InputStreamReader(queryIn));
+
+            try {
+                while (queryReader.ready()) {
+                    String line = queryReader.readLine();
+                    ArrayList<Float> selectivities = new ArrayList<Float>();
+                    StringTokenizer tokenizer = new StringTokenizer(line, " ");
+                    while (tokenizer.hasMoreTokens()) {
+                        String token = tokenizer.nextToken();
+                        selectivities.add(Float.parseFloat(token));
+                    }
+                    queries.add(selectivities.toArray(new Float[selectivities
+                            .size()]));
+                }
+            } finally {
+                queryReader.close();
+            }
+        } catch (IOException exception) {
+            System.out.println("error");
+        }
+
+        return queries;
+    }
+
     public static String formatCode(List<String> terms, boolean noBranch) {
         if (noBranch) {
             String noBranchTerm = terms.remove(terms.size() - 1);

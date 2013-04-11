@@ -14,9 +14,9 @@ import java.util.StringTokenizer;
  * <p>
  * Class abstraction of a query optimizer for selection conditions in main memory
  * as described in algorithm 4.11 of Kenneth Ross's <i>Selection Conditions in Main
- * Memory</i> [Columbia University, 2004]. An instance of QueryOptimizer represents 
- * an optimizer for a single query containing only simple selection conditions. 
- * Multiple queries can be optimized concurrently by instantiating multiple 
+ * Memory</i> [Columbia University, 2004]. An instance of QueryOptimizer represents
+ * an optimizer for a single query containing only simple selection conditions.
+ * Multiple queries can be optimized concurrently by instantiating multiple
  * QueryOptimizers, which is made easy by the fromList(queries, config) factory method.
  * </p>
  * <p>
@@ -79,14 +79,33 @@ public class QueryOptimizer {
     private final Float[] selectivities;
 	private QueryPlan[] searchSpace;
 	private Properties config;
+	private boolean finished;
 
+	/**
+	 * Constructs a latent QueryOptimizer instance from the input data. No optimization or
+	 * significant memory usage occurs until the optimize() method is called on the instance.
+	 *
+	 * @param selectivities floating-point selectivity values for each input selection condition.
+	 * @param config java properties with information about the machine we are optimizing for.
+	 */
 	private QueryOptimizer(Float[] selectivities, Properties config) {
 		this.selectivities = selectivities;
 		this.config = config;
+		this.finished = false;
 	}
 
-	public static QueryOptimizer[] fromList(List<Float[]> queries,
-			Properties config) {
+	/**
+	 * Returns an array of new QueryOptimizer instances, one for each set of selectivities in
+	 * the input.
+	 *
+	 * @param queries list of float arrays, where each array represents a single query to be
+	 * optimized and contains floating-point selectivity values for each selection condition
+	 * in the query.
+	 * @param config java properties with information about the machine we are optimizing for.
+	 * @return an array of new QueryOptimizer instances, one for each set of selectivities in
+     * the input
+	 */
+	public static QueryOptimizer[] fromList(List<Float[]> queries, Properties config) {
 		QueryOptimizer[] o = new QueryOptimizer[queries.size()];
 		for (int i = 0; i < o.length; i++) {
 			o[i] = new QueryOptimizer(queries.get(i), config);
@@ -94,55 +113,44 @@ public class QueryOptimizer {
 		return o;
 	}
 
+	/**
+	 * Algorithm 4.11
+	 */
 	private void optimize() {
-	    /* set up the search space with power set of selectivities */
+
+	    /* set up the search space with power set of selection conditions */
 		initializeSearchSpace();
 
 		/* optimize */
+
+		/* set finished flag */
+		this.finished = true;
 	}
 
+    /**
+     * @return formatted statistics about the optimization
+     */
+    public String getFormattedStatistics() {
+        assert finished;
+        return searchSpace[searchSpace.length - 1].getFormattedStatistics(selectivities);
+    }
+
+	/**
+	 * <p>
+	 * Step (1) of Algorithm 4.11
+	 * </p>
+	 * <p>
+	 * Consider all plans with no &&s:
+	 * Generate all 2k - 1 plans using only &-terms, one plan for each nonempty subset s
+	 * of S. Store the computed cost (Example 4.5) in A[s].c. If the cost for the No-Branch
+	 * algorithm is smaller, replace A[s].c by that cost (Example 4.4) and set A[s].b = 1."
+	 * </p>
+	 */
 	private void initializeSearchSpace() {
-		this.searchSpace = new QueryPlan[2 ^ selectivities.length];
+		this.searchSpace = new QueryPlan[2 ^ selectivities.length - 1];
 		for (int i = 0, bitmask = 1; i < searchSpace.length; i++, bitmask++) {
 			searchSpace[i] = new QueryPlan(bitmask, selectivities);
 		}
-	}
-
-
-	private String getStatistics() {
-		return searchSpace[searchSpace.length - 1].getFormattedStatistics(selectivities);
-	}
-
-	private static List<Float[]> readQueryFile(String queryFileName) {
-		File queryFile = new File(queryFileName);
-		BufferedReader queryReader;
-		List<Float[]> queries = new ArrayList<Float[]>();
-
-		try {
-			InputStream queryIn = new BufferedInputStream(new FileInputStream(
-					queryFile));
-			queryReader = new BufferedReader(new InputStreamReader(queryIn));
-
-			try {
-				while (queryReader.ready()) {
-					String line = queryReader.readLine();
-					ArrayList<Float> selectivities = new ArrayList<Float>();
-					StringTokenizer tokenizer = new StringTokenizer(line, " ");
-					while (tokenizer.hasMoreTokens()) {
-						String token = tokenizer.nextToken();
-						selectivities.add(Float.parseFloat(token));
-					}
-					queries.add(selectivities.toArray(new Float[selectivities
-							.size()]));
-				}
-			} finally {
-				queryReader.close();
-			}
-		} catch (IOException exception) {
-			System.out.println("error");
-		}
-
-		return queries;
 	}
 
 	public static void main(String[] args) {
@@ -160,10 +168,10 @@ public class QueryOptimizer {
 			return;
 		}
 
-		QueryOptimizer[] optimizers = fromList(readQueryFile(args[1]), config);
+		QueryOptimizer[] optimizers = fromList(QueryOptimizerUtils.readQueryFile(args[1]), config);
 		for (QueryOptimizer o : optimizers) {
 			o.optimize();
-			System.out.print(o.getStatistics());
+			System.out.print(o.getFormattedStatistics());
 		}
 	}
 

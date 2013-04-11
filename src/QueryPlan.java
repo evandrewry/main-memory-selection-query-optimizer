@@ -13,7 +13,7 @@ class QueryPlan {
 	public QueryPlan(long bitmask, Float[] selectivities) {
 	    /* set bitmask and selectivity product */
 		this.bitmask = bitmask;
-		this.productOfSelectivities = QueryPlanUtils.productOfSelectivities(selectivities, bitmask);
+		this.productOfSelectivities = QueryOptimizerUtils.productOfSelectivities(selectivities, bitmask);
 
 		/* compare to no-branch plan */
 	    float branchCost = calculateCost();
@@ -53,7 +53,7 @@ class QueryPlan {
 
 
     public String getFormattedStatistics(Float[] selectivities) {
-        return QueryPlanUtils.formatStatistics(selectivities, getFormattedCode(), this.cost);
+        return QueryOptimizerUtils.formatStatistics(selectivities, getFormattedCode(), this.cost);
     }
 
     public List<String> getFormattedTerms() {
@@ -68,19 +68,19 @@ class QueryPlan {
 	}
 
 	public String getLocalTerm() {
-        return QueryPlanUtils.formatTerm(getAtoms());
+        return QueryOptimizerUtils.formatTerm(getAtoms());
     }
 
     public List<Integer> getAtoms() {
-        return QueryPlanUtils.atomsOfBitmask(this.bitmask);
+        return QueryOptimizerUtils.atomsOfBitmask(this.bitmask);
     }
 
     public List<Integer> getIndices() {
-        return QueryPlanUtils.indicesOfBitmask(this.bitmask);
+        return QueryOptimizerUtils.indicesOfBitmask(this.bitmask);
     }
 
     public String getFormattedCode() {
-        return QueryPlanUtils.formatCode(getFormattedTerms(), this.noBranchFlag);
+        return QueryOptimizerUtils.formatCode(getFormattedTerms(), this.noBranchFlag);
     }
 
 }

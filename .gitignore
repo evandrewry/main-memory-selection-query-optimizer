@@ -1,0 +1,8 @@
+#java
+bin/*
+*.class
+
+#vim
+*~
+*.swo
+*.swp

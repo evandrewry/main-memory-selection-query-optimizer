@@ -5,14 +5,14 @@ import java.util.List;
 class QueryPlan {
 	long bitmask;
 	int numberOfBT;
-	double productOfSelectivities;
+	float productOfSelectivities;
 	boolean noBranchFlag;
-	double cost;
+	float cost;
 	QueryPlan left;
 	QueryPlan right;
 
-	public QueryPlan(long bitmask, int numberOfBT, double productOfSelectivities,
-			boolean noBranchFlag, double cost) {
+	public QueryPlan(long bitmask, int numberOfBT, float productOfSelectivities,
+			boolean noBranchFlag, float cost) {
 		this.bitmask = bitmask;
 		this.numberOfBT = numberOfBT;
 		this.productOfSelectivities = productOfSelectivities;
@@ -38,7 +38,12 @@ class QueryPlan {
 	    return unionBitmask(plan) - 1;
 	}
 
-	public List<String> getFormattedTerms() {
+
+    public String getFormattedStatistics(float[] selectivities) {
+        return QueryPlanUtils.formatStatistics(selectivities, getFormattedCode(), this.cost);
+    }
+
+    public List<String> getFormattedTerms() {
 	    List<String> terms = new ArrayList<String>();
 	    if (this.left != null && this.right != null) {
 	        terms = left.getFormattedTerms();
@@ -50,67 +55,19 @@ class QueryPlan {
 	}
 
 	public String getLocalTerm() {
-	    String term = "";
-        for (short atom : getAtoms()) {
-            term = term.equals("") ? formatAtom(atom) : String.format(TERM_FMT, term, formatAtom(atom));
-        }
-        return term;
+        return QueryPlanUtils.formatTerm(getAtoms());
     }
 
-    public List<Short> getAtoms() {
-        return atomsOfBitmask(this.bitmask);
+    public List<Integer> getAtoms() {
+        return QueryPlanUtils.atomsOfBitmask(this.bitmask);
     }
 
-    private static List<Short> atomsOfBitmask(long bitmask) {
-        List<Short> terms = new ArrayList<Short>();
-        for (short i = 1; i <= BITS_PER_BITMASK; i++){
-            if ((bitmask & 0x0001) == 0x0001) {
-                terms.add(i);
-            }
-            bitmask >>>= 0x0001;
-        }
-        return terms;
+    public List<Integer> getIndices() {
+        return QueryPlanUtils.indicesOfBitmask(this.bitmask);
     }
 
     public String getFormattedCode() {
-        return getFormattedCode(getFormattedTerms(), this.noBranchFlag);
+        return QueryPlanUtils.formatCode(getFormattedTerms(), this.noBranchFlag);
     }
-
-    private static String getFormattedCode(List<String> terms, boolean noBranch) {
-        if (noBranch) {
-            String noBranchTerm = terms.remove(terms.size() - 1);
-            return String.format(NO_BRANCH_CODE_FMT, formatTerms(terms), noBranchTerm);
-        } else {
-            return String.format(CODE_FMT, formatTerms(terms));
-        }
-    }
-
-    private static String formatTerms(List<String> terms) {
-        if (terms.size() == 1) {
-            return terms.get(0);
-        } else {
-            String fst = terms.remove(0);
-            return String.format(TERMS_FMT, fst, formatTerms(terms));
-        }
-    }
-
-    private static String formatAtom(short atom) {
-        return String.format(ATOM_FMT, atom, atom);
-    }
-
-    private static final String NO_BRANCH_CODE_FMT =
-            "if(%s) {\n" +
-            "    answer[j] = i;\n" +
-            "    j += (%s);\n" +
-            "}\n";
-    private static final String CODE_FMT =
-            "if(%s) {\n" +
-            "    answer[j++] = i;\n" +
-            "}\n";
-    private static final String ATOM_FMT = "t%d[o%d[i]]";
-    private static final String TERM_FMT = "%s & %s";
-    private static final String TERMS_FMT = "%s && %s";
-    public static final short BITS_PER_BITMASK = 64;
-
 
 }

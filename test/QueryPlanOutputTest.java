@@ -35,4 +35,16 @@ public class QueryPlanOutputTest {
         System.out.println(code);
 
     }
+
+
+    @Test
+    public void test10101NoBranch() {
+        P10101.setChildren(P00100, P10001);
+        P10101.noBranchFlag = true;
+        List<String>  t = P10101.getFormattedTerms();
+        String code = P10101.getFormattedCode();
+        System.out.println(t);
+        System.out.println(code);
+
+    }
 }

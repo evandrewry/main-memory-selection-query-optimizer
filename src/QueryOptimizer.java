@@ -99,16 +99,4 @@ public class QueryOptimizer {
 		}
 	}
 
-	private static String getFormattedStatistics(float[] selectivities, String code, float cost) {
-		return String.format(STATISTICS_FMT, selectivities, code, cost);
-	}
-
-	private static final String STATISTICS_FMT =
-			"==================================================================\n"
-			+ "%s\n"
-			+ "------------------------------------------------------------------\n"
-			+ "%s\n"
-			+ "------------------------------------------------------------------\n"
-			+ "cost: %s\n"
-			+ "==================================================================\n";
 }

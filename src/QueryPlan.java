@@ -38,7 +38,6 @@ class QueryPlan {
     }
 
     private float calculateCost() {
-        // TODO Auto-generated method stub
     	float cost = 0;
     	/* calculate q */
     	float q = getQ();
@@ -64,7 +63,7 @@ class QueryPlan {
     }
 
     public boolean intersects(QueryPlan plan) {
-        return (this.bitmask & plan.bitmask) == 0;
+        return (this.bitmask & plan.bitmask) != 0;
     }
 
     public long unionBitmask(QueryPlan plan) {
@@ -75,7 +74,6 @@ class QueryPlan {
         return (int) (unionBitmask(plan) - 1);
     }
 
-
     public String getFormattedStatistics(Float[] selectivities) {
         return QueryOptimizerUtils.formatStatistics(selectivities, getFormattedCode(), this.cost);
     }
@@ -83,8 +81,8 @@ class QueryPlan {
     public List<String> getFormattedTerms() {
         List<String> terms = new ArrayList<String>();
         if (this.left != null && this.right != null) {
-            terms = left.getFormattedTerms();
-            terms.addAll(right.getFormattedTerms());
+            terms = this.left.getFormattedTerms();
+            terms.addAll(this.right.getFormattedTerms());
         } else {
             terms.add(getLocalTerm());
         }
@@ -141,9 +139,11 @@ class QueryPlan {
     }
 
     public boolean subOptimalByDMetric(QueryPlan s2) {
-        // TODO Auto-generated method stub
-
-        return false;
+    	float p1 = s2.productOfSelectivities;
+        float p2 = getLeftMostTerm().productOfSelectivities;
+        float dmetric1 = getLeftMostTerm().getFixedCost();
+        float dmetric2 = s2.getFixedCost();
+        return p2 <= p1 && dmetric1 < dmetric2;
     }
 
     public List<QueryPlan> getLeaves() {

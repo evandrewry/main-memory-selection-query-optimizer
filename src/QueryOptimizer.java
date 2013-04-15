@@ -128,6 +128,9 @@ public class QueryOptimizer {
                         continue;
                     } else {
                         QueryPlan old = searchSpace[s2.unionIndex(s)];
+                        if (old == s) {
+                        	System.out.println("uh oh found an issue");
+                        }
                         float combinedCost = QueryOptimizerUtils.combinedCost(s2, s);
                         if (combinedCost < old.cost) {
                             old.setChildren(s2, s);

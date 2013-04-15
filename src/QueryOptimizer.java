@@ -128,9 +128,10 @@ public class QueryOptimizer {
                         continue;
                     } else {
                         QueryPlan old = searchSpace[s2.unionIndex(s)];
-                        QueryPlan combined = new QueryPlan(s2.unionBitmask(s), selectivities);
-                        if (combined.cost < old.cost) {
+                        float combinedCost = QueryOptimizerUtils.combinedCost(s2, s);
+                        if (combinedCost < old.cost) {
                             old.setChildren(s2, s);
+                            old.cost = combinedCost;
                         }
                     }
 

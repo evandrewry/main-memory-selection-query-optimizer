@@ -12,36 +12,55 @@ import java.util.StringTokenizer;
 
 
 public class QueryOptimizerUtils {
+
+
+    public static float combinedCost(QueryPlan left, QueryPlan right) {
+        float cost = 0;
+        cost += left.getFixedCost() + getM() * left.getQ();
+        cost += left.productOfSelectivities*right.cost;
+        /*
+        List<QueryPlan> leaves = left.getLeaves();
+        leaves.addAll(right.getLeaves());
+        QueryPlan e;
+        while (!leaves.isEmpty()) {
+            e = leaves.remove(leaves.size() - 1);
+            cost += e.getFixedCost() + getM() * e.getQ() + e.productOfSelectivities;
+        }
+        */
+        return cost;
+    }
+
+
 	private static Properties config;
-	
+
 	public static Properties getConfig() {
 		return config;
 	}
-	
+
 	public static void setConfig(Properties newConfig) {
 		config = newConfig;
 	}
-	
+
 	public static float getR() {
 		return Float.parseFloat(config.getProperty("r"));
 	}
-	
+
 	public static float getT() {
 		return (float) Integer.parseInt(config.getProperty("t"));
 	}
-	
+
 	public static float getL() {
 		return (float) Integer.parseInt(config.getProperty("l"));
 	}
-	
+
 	public static float getM() {
 		return (float) Integer.parseInt(config.getProperty("m"));
 	}
-	
+
 	public static float getA() {
 		return (float) Integer.parseInt(config.getProperty("a"));
 	}
-	
+
 	public static float getF() {
 		return (float) Integer.parseInt(config.getProperty("f"));
 	}
@@ -143,7 +162,7 @@ public class QueryOptimizerUtils {
         }
         return terms;
     }
-    
+
     public static int numberOfTerms(Float[] selectivities, long bitmask) {
         int count = 0;
         for (Float s : selectivities) {
@@ -154,7 +173,7 @@ public class QueryOptimizerUtils {
         }
         return count;
     }
-    
+
     public static float productOfSelectivities(Float[] selectivities, long bitmask) {
         float prod = 1;
         for (Float s : selectivities) {
@@ -174,11 +193,11 @@ public class QueryOptimizerUtils {
         + "------------------------------------------------------------------\n"
         + "cost: %s\n"
         + "==================================================================\n";
- 
+
     private static final String NO_BRANCH_CODE_FLAT_FMT =
             "answer[j] = i;\n" +
             "j += (%s);\n";
-    
+
     private static final String NO_BRANCH_CODE_FMT =
         "if(%s) {\n" +
         "    answer[j] = i;\n" +

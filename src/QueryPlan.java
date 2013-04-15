@@ -41,7 +41,7 @@ class QueryPlan {
         // TODO Auto-generated method stub
     	float cost = 0;
     	/* calculate q */
-    	float q = this.productOfSelectivities <= .5? this.productOfSelectivities : 1 - this.productOfSelectivities;
+    	float q = getQ();
 
     	/* kr + (k - 1)l */
     	cost += k * QueryOptimizerUtils.getR() + (k - 1) * QueryOptimizerUtils.getL();
@@ -54,10 +54,13 @@ class QueryPlan {
         return cost;
     }
 
+    public float getQ() {
+        return this.productOfSelectivities <= .5? this.productOfSelectivities : 1 - this.productOfSelectivities;
+    }
+
     public void setChildren(QueryPlan left, QueryPlan right) {
         this.left = left;
         this.right = right;
-        this.cost = left.cost + right.cost;
     }
 
     public boolean intersects(QueryPlan plan) {
@@ -129,13 +132,30 @@ class QueryPlan {
     }
 
     public boolean subOptimalByCMetric(QueryPlan s2) {
-        // TODO Auto-generated method stub
-        return 0;
+        /* if p2 <= p1 and (p2 - 1/fcost(E2)) < (P1 - 1/Fcost(E1)) */
+        float p1 = s2.productOfSelectivities;
+        float p2 = getLeftMostTerm().productOfSelectivities;
+        float cmetric1 = (p2 - 1) / getLeftMostTerm().getFixedCost();
+        float cmetric2 = (p1 - 1) / s2.getFixedCost();
+        return p2 <= p1 && cmetric1 < cmetric2;
     }
 
     public boolean subOptimalByDMetric(QueryPlan s2) {
         // TODO Auto-generated method stub
+
         return false;
+    }
+
+    public List<QueryPlan> getLeaves() {
+        List<QueryPlan> l = new ArrayList<QueryPlan>();
+        if (left != null && right != null) {
+            l = left.getLeaves();
+            l.addAll(right.getLeaves());
+            return l;
+        } else {
+            l.add(this);
+            return l;
+        }
     }
 
 }

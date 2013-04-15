@@ -81,7 +81,11 @@ public class QueryOptimizerUtils {
     public static String formatCode(List<String> terms, boolean noBranch) {
         if (noBranch) {
             String noBranchTerm = terms.remove(terms.size() - 1);
-            return String.format(NO_BRANCH_CODE_FMT, formatTerms(terms), noBranchTerm);
+            if (terms.size() == 0) {
+            	return String.format(NO_BRANCH_CODE_FLAT_FMT, noBranchTerm);
+            } else {
+            	return String.format(NO_BRANCH_CODE_FMT, formatTerms(terms), noBranchTerm);
+            }
         } else {
             return String.format(CODE_FMT, formatTerms(terms));
         }
@@ -170,6 +174,11 @@ public class QueryOptimizerUtils {
         + "------------------------------------------------------------------\n"
         + "cost: %s\n"
         + "==================================================================\n";
+ 
+    private static final String NO_BRANCH_CODE_FLAT_FMT =
+            "answer[j] = i;\n" +
+            "j += (%s);\n";
+    
     private static final String NO_BRANCH_CODE_FMT =
         "if(%s) {\n" +
         "    answer[j] = i;\n" +

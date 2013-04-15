@@ -1,8 +1,10 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 
 class QueryPlan {
+	int k;
     long bitmask;
     float productOfSelectivities;
     boolean noBranchFlag;
@@ -13,19 +15,26 @@ class QueryPlan {
     public QueryPlan(long bitmask, Float[] selectivities) {
         /* set bitmask and selectivity product */
         this.bitmask = bitmask;
+        this.k = QueryOptimizerUtils.numberOfTerms(selectivities, bitmask);
         this.productOfSelectivities = QueryOptimizerUtils.productOfSelectivities(selectivities, bitmask);
 
         /* compare to no-branch plan */
-        float branchCost = calculateCost();
-        float noBranchCost = calculateNoBranchCost();
+        float branchCost = calculateNoBranchCost();
+        float noBranchCost = calculateCost();
         this.noBranchFlag = branchCost > noBranchCost;
         this.cost = this.noBranchFlag ? noBranchCost : branchCost;
-
     }
-
     private float calculateNoBranchCost() {
         // TODO Auto-generated method stub
-        return 0;
+    	float cost = 0;
+    	/* kr + (k - 1)l */
+    	cost += k * QueryOptimizerUtils.getR() + (k - 1) * QueryOptimizerUtils.getL();
+    	/* f1 + ... + fk */
+    	cost += k * QueryOptimizerUtils.getF();
+    	/* + a */
+    	cost += QueryOptimizerUtils.getA();
+    	
+        return cost;
     }
 
     private float calculateCost() {

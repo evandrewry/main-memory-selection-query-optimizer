@@ -7,11 +7,45 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 
 public class QueryOptimizerUtils {
-
+	private static Properties config;
+	
+	public static Properties getConfig() {
+		return config;
+	}
+	
+	public static void setConfig(Properties newConfig) {
+		config = newConfig;
+	}
+	
+	public static int getR() {
+		return Integer.parseInt(config.getProperty("r"));
+	}
+	
+	public static int getT() {
+		return Integer.parseInt(config.getProperty("t"));
+	}
+	
+	public static int getL() {
+		return Integer.parseInt(config.getProperty("l"));
+	}
+	
+	public static int getM() {
+		return Integer.parseInt(config.getProperty("m"));
+	}
+	
+	public static int getA() {
+		return Integer.parseInt(config.getProperty("a"));
+	}
+	
+	public static int getF() {
+		return Integer.parseInt(config.getProperty("f"));
+	}
+	
     public static List<Float[]> readQueryFile(String queryFileName) {
         File queryFile = new File(queryFileName);
         BufferedReader queryReader;
@@ -105,7 +139,18 @@ public class QueryOptimizerUtils {
         }
         return terms;
     }
-
+    
+    public static int numberOfTerms(Float[] selectivities, long bitmask) {
+        int count = 0;
+        for (Float s : selectivities) {
+            if ((bitmask & 0x0001) == 0x0001) {
+            	count++;
+            }
+            bitmask >>>= 0x0001;
+        }
+        return count;
+    }
+    
     public static float productOfSelectivities(Float[] selectivities, long bitmask) {
         float prod = 1;
         for (Float s : selectivities) {

@@ -149,7 +149,7 @@ public class QueryOptimizer {
     private void initializeSearchSpace() {
         this.searchSpace = new QueryPlan[2 ^ selectivities.length - 1];
         for (int i = 0, bitmask = 1; i < searchSpace.length; i++, bitmask++) {
-            searchSpace[i] = new QueryPlan(bitmask, selectivities);
+            searchSpace[i] = new QueryPlan(bitmask, selectivities, config);
         }
     }
 
@@ -159,7 +159,7 @@ public class QueryOptimizer {
             return;
         }
 
-        File configFile = new File(args[2]);
+        File configFile = new File(args[1]);
         Properties config = new Properties();
         try {
             config.load(new FileInputStream(configFile));
@@ -167,8 +167,8 @@ public class QueryOptimizer {
             System.out.println(exception.getMessage());
             return;
         }
-
-        QueryOptimizer[] optimizers = fromList(QueryOptimizerUtils.readQueryFile(args[1]), config);
+        QueryOptimizerUtils.setConfig(config);
+        QueryOptimizer[] optimizers = fromList(QueryOptimizerUtils.readQueryFile(args[0]), config);
         for (QueryOptimizer o : optimizers) {
             o.optimize();
             System.out.print(o.getFormattedStatistics());

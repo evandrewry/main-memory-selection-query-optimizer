@@ -19,13 +19,13 @@ class QueryPlan {
         this.productOfSelectivities = QueryOptimizerUtils.productOfSelectivities(selectivities, bitmask);
 
         /* compare to no-branch plan */
-        float branchCost = calculateNoBranchCost();
-        float noBranchCost = calculateCost();
+        float noBranchCost = calculateNoBranchCost();
+        float branchCost = calculateCost();
         this.noBranchFlag = branchCost > noBranchCost;
         this.cost = this.noBranchFlag ? noBranchCost : branchCost;
     }
+    
     private float calculateNoBranchCost() {
-        // TODO Auto-generated method stub
     	float cost = 0;
     	/* kr + (k - 1)l */
     	cost += k * QueryOptimizerUtils.getR() + (k - 1) * QueryOptimizerUtils.getL();
@@ -39,7 +39,19 @@ class QueryPlan {
 
     private float calculateCost() {
         // TODO Auto-generated method stub
-        return 0;
+    	float cost = 0;
+    	/* calculate q */
+    	float q = this.productOfSelectivities <= .5? this.productOfSelectivities : 1 - this.productOfSelectivities;
+   
+    	/* kr + (k - 1)l */
+    	cost += k * QueryOptimizerUtils.getR() + (k - 1) * QueryOptimizerUtils.getL();
+    	/* f1 + ... + fk */
+    	cost += k * QueryOptimizerUtils.getF();
+    	/* + t ... */
+    	cost += QueryOptimizerUtils.getT();
+    	/* mq + p1..pka */
+    	cost += QueryOptimizerUtils.getM() * QueryOptimizerUtils.getA() + this.productOfSelectivities * QueryOptimizerUtils.getA();
+        return cost;
     }
 
     public void setChildren(QueryPlan left, QueryPlan right) {

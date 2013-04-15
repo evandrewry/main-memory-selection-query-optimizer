@@ -22,30 +22,30 @@ public class QueryOptimizerUtils {
 		config = newConfig;
 	}
 	
-	public static int getR() {
-		return Integer.parseInt(config.getProperty("r"));
+	public static float getR() {
+		return Float.parseFloat(config.getProperty("r"));
 	}
 	
-	public static int getT() {
-		return Integer.parseInt(config.getProperty("t"));
+	public static float getT() {
+		return (float) Integer.parseInt(config.getProperty("t"));
 	}
 	
-	public static int getL() {
-		return Integer.parseInt(config.getProperty("l"));
+	public static float getL() {
+		return (float) Integer.parseInt(config.getProperty("l"));
 	}
 	
-	public static int getM() {
-		return Integer.parseInt(config.getProperty("m"));
+	public static float getM() {
+		return (float) Integer.parseInt(config.getProperty("m"));
 	}
 	
-	public static int getA() {
-		return Integer.parseInt(config.getProperty("a"));
+	public static float getA() {
+		return (float) Integer.parseInt(config.getProperty("a"));
 	}
 	
-	public static int getF() {
-		return Integer.parseInt(config.getProperty("f"));
+	public static float getF() {
+		return (float) Integer.parseInt(config.getProperty("f"));
 	}
-	
+
     public static List<Float[]> readQueryFile(String queryFileName) {
         File queryFile = new File(queryFileName);
         BufferedReader queryReader;

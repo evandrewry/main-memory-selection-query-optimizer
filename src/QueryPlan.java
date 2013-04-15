@@ -24,7 +24,7 @@ class QueryPlan {
         this.noBranchFlag = branchCost > noBranchCost;
         this.cost = this.noBranchFlag ? noBranchCost : branchCost;
     }
-    
+
     private float calculateNoBranchCost() {
     	float cost = 0;
     	/* kr + (k - 1)l */
@@ -33,7 +33,7 @@ class QueryPlan {
     	cost += k * QueryOptimizerUtils.getF();
     	/* + a */
     	cost += QueryOptimizerUtils.getA();
-    	
+
         return cost;
     }
 
@@ -42,7 +42,7 @@ class QueryPlan {
     	float cost = 0;
     	/* calculate q */
     	float q = this.productOfSelectivities <= .5? this.productOfSelectivities : 1 - this.productOfSelectivities;
-   
+
     	/* kr + (k - 1)l */
     	cost += k * QueryOptimizerUtils.getR() + (k - 1) * QueryOptimizerUtils.getL();
     	/* f1 + ... + fk */
@@ -68,8 +68,8 @@ class QueryPlan {
         return (this.bitmask | plan.bitmask);
     }
 
-    public long unionIndex(QueryPlan plan) {
-        return unionBitmask(plan) - 1;
+    public int unionIndex(QueryPlan plan) {
+        return (int) (unionBitmask(plan) - 1);
     }
 
 
@@ -102,6 +102,40 @@ class QueryPlan {
 
     public String getFormattedCode() {
         return QueryOptimizerUtils.formatCode(getFormattedTerms(), this.noBranchFlag);
+    }
+
+    public int getCMetric() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public float getFixedCost() {
+        float cost = 0;
+        /* kr + (k - 1)l */
+        cost += k * QueryOptimizerUtils.getR() + (k - 1) * QueryOptimizerUtils.getL();
+        /* f1 + ... + fk */
+        cost += k * QueryOptimizerUtils.getF();
+        /* + t ... */
+        cost += QueryOptimizerUtils.getT();
+        return cost;
+    }
+
+    public QueryPlan getLeftMostTerm() {
+        QueryPlan q = this;
+        while (q.left != null) {
+            q = q.left;
+        }
+        return q;
+    }
+
+    public boolean subOptimalByCMetric(QueryPlan s2) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public boolean subOptimalByDMetric(QueryPlan s2) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

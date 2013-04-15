@@ -116,6 +116,27 @@ public class QueryOptimizer {
         initializeSearchSpace();
 
         /* optimize */
+        for (QueryPlan s : searchSpace) {
+            /* s is the right child */
+            for (QueryPlan s2 : searchSpace) {
+                /* s.t. s intersect s' = empty set */
+                if (!s.intersects(s2)) {
+                    /* s2 is the left child */
+                    if (s.subOptimalByCMetric(s2)) {
+                        continue;
+                    } else if (s2.productOfSelectivities <= 0.5 && s.subOptimalByDMetric(s2)) {
+                        continue;
+                    } else {
+                        QueryPlan old = searchSpace[s2.unionIndex(s)];
+                        QueryPlan combined = new QueryPlan(s2.unionBitmask(s), selectivities);
+                        if (combined.cost < old.cost) {
+                            old.setChildren(s2, s);
+                        }
+                    }
+
+                }
+            }
+        }
 
         /* set finished flag */
         this.finished = true;

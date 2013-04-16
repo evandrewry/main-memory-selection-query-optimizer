@@ -108,7 +108,7 @@ public class QueryOptimizer {
     }
 
     /**
-     * Algorithm 4.11
+     * Algorithm 4.11 from <i>Selection Conditions in Main Memory</i> [Ross, 2004]
      */
     private void optimize() {
 
@@ -123,18 +123,23 @@ public class QueryOptimizer {
                 if (!s.intersects(s2)) {
                     /* s2 is the left child */
                     if (s.subOptimalByCMetric(s2)) {
+                        /* do nothing; suboptimal by Lemma 4.8 */
                         continue;
                     } else if (s2.productOfSelectivities <= 0.5 && s.subOptimalByDMetric(s2)) {
+                        /* do nothing; suboptimal by Lemma 4.9 */
                         continue;
                     } else {
-                        QueryPlan old = searchSpace[s2.unionIndex(s)];
-                        if (old == s) {
+                        /* locate current plan for s U s2 */
+                        QueryPlan cur = searchSpace[s2.unionIndex(s)];
+                        if (cur == s) {
                         	System.out.println("uh oh found an issue");
                         }
+
+                        /* calculate the combined cost of s2 and s, compare to cost of current plan */
                         float combinedCost = QueryOptimizerUtils.combinedCost(s2, s);
-                        if (combinedCost < old.cost) {
-                            old.setChildren(s2, s);
-                            old.cost = combinedCost;
+                        if (combinedCost < cur.cost) {
+                            cur.setChildren(s2, s);
+                            cur.cost = combinedCost;
                         }
                     }
 
@@ -179,6 +184,7 @@ public class QueryOptimizer {
             return;
         }
 
+        /* read configuration file */
         File configFile = new File(args[1]);
         Properties config = new Properties();
         QueryOptimizerUtils.setConfig(config);
@@ -189,7 +195,10 @@ public class QueryOptimizer {
             return;
         }
 
+        /* create QueryOptimizers from input query file */
         QueryOptimizer[] optimizers = fromList(QueryOptimizerUtils.readQueryFile(args[0]), config);
+
+        /* perform optimizations and print out statistics */
         for (QueryOptimizer o : optimizers) {
             o.optimize();
             System.out.print(o.getFormattedStatistics());

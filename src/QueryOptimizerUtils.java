@@ -89,15 +89,6 @@ public class QueryOptimizerUtils {
         float cost = 0;
         cost += left.getFixedCost() + getM() * left.getQ();
         cost += left.productOfSelectivities*right.cost;
-        /*
-        List<QueryPlan> leaves = left.getLeaves();
-        leaves.addAll(right.getLeaves());
-        QueryPlan e;
-        while (!leaves.isEmpty()) {
-            e = leaves.remove(leaves.size() - 1);
-            cost += e.getFixedCost() + getM() * e.getQ() + e.productOfSelectivities;
-        }
-        */
         return cost;
     }
 
